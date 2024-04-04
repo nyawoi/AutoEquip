@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using UnityEngine;
 
 namespace AetharNet.Mods.ZumbiBlocks2.AutoEquip.Patches;
 
@@ -32,8 +33,33 @@ public static class PlayerInteractionPatch
         // Retrieve the current item in the assigned slot
         var currentItem = __instance.playerMain.inventory.GetEquipment((int)equipmentSlot);
         
-        // If an item is already in the slot, run the original method
-        if (!currentItem.GetDBItem().IsNone) return true;
+        // Does the user wish to force-equip the item?
+        var forceEquipItem = Input.GetKey(KeyCode.LeftShift);
+
+        // If an item already exists in the slot, and the player does not wish to force-equip, run the original method
+        if (!currentItem.GetDBItem().IsNone && !forceEquipItem) return true;
+        
+        // If the player wishes to force-equip the item,
+        if (forceEquipItem)
+        {
+            // and the items are not of the same type
+            if (currentItem.GetDBItem().itemID == droppedLoot.item.GetDBItem().itemID) return true;
+            
+            // find open space in the inventory to move the item
+            var placeForCurrentItem = __instance.playerMain.inventory.FindPlaceFor(currentItem.id, currentItem.stackCount, true, false);
+            
+            // If there is no more space in the inventory,
+            if (placeForCurrentItem == null)
+            {
+                // drop the currently equipped item
+                __instance.playerMain.inventory.DropLoot(currentItem);
+            }
+            else
+            {
+                // otherwise, move the item into the inventory
+                ItemContainer.PutLootIntoPlace(currentItem, placeForCurrentItem, __instance.playerMain.inventory.storage);
+            }
+        }
         
         // Retrieve the piece of loot, removing it from the world
         var inventoryItem = LootController.instance.PullLoot(droppedLoot);
@@ -44,7 +70,7 @@ public static class PlayerInteractionPatch
         
         // Equip the item into its appropriate slot
         __instance.playerMain.inventory.SetEquipment(inventoryItem, (int)equipmentSlot);
-
+        
         // Do not call the original method; we've equipped the item and have no need to store it in inventory
         return false;
     }
@@ -66,8 +92,33 @@ public static class PlayerInteractionPatch
         // Retrieve the current item in the assigned slot
         var currentItem = __instance.playerMain.inventory.GetEquipment((int)equipmentSlot);
         
-        // If an item is already in the slot, run the original method
-        if (!currentItem.GetDBItem().IsNone) return true;
+        // Does the user wish to force-equip the item?
+        var forceEquipItem = Input.GetKey(KeyCode.LeftShift);
+
+        // If an item already exists in the slot, and the player does not wish to force-equip, run the original method
+        if (!currentItem.GetDBItem().IsNone && !forceEquipItem) return true;
+        
+        // If the player wishes to force-equip the item,
+        if (forceEquipItem)
+        {
+            // and the items are not of the same type
+            if (currentItem.GetDBItem().itemID == item.GetDBItem().itemID) return true;
+            
+            // find open space in the inventory to move the item
+            var placeForCurrentItem = __instance.playerMain.inventory.FindPlaceFor(currentItem.id, currentItem.stackCount, true, false);
+            
+            // If there is no more space in the inventory,
+            if (placeForCurrentItem == null)
+            {
+                // drop the currently equipped item
+                __instance.playerMain.inventory.DropLoot(currentItem);
+            }
+            else
+            {
+                // otherwise, move the item into the inventory
+                ItemContainer.PutLootIntoPlace(currentItem, placeForCurrentItem, __instance.playerMain.inventory.storage);
+            }
+        }
         
         // Equip the item into its appropriate slot
         __instance.playerMain.inventory.SetEquipment(item, (int)equipmentSlot);
