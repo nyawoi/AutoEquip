@@ -24,16 +24,16 @@ public static class PlayerInteractionPatch
         if (interactableObj is not DroppedLoot droppedLoot) return false;
         
         // Retrieve the appropriate inventory slot for the item
-        var inventorySlot = GetInventorySlot(droppedLoot.item.GetDBItem().GetSubType());
+        var equipmentSlot = GetEquipmentSlot(droppedLoot.item);
         
         // If the item does not belong in any currently available slots, run the original method
-        if (inventorySlot == PlayerInventory.EquippedID.COUNT) return true;
+        if (equipmentSlot == PlayerInventory.EquippedID.COUNT) return true;
 
         // Retrieve the current item in the assigned slot
-        var currentItem = __instance.playerMain.inventory.GetEquipment((int)inventorySlot);
+        var currentItem = __instance.playerMain.inventory.GetEquipment((int)equipmentSlot);
         
         // If an item is already in the slot, run the original method
-        if (currentItem.GetDBItem().itemID is not InventoryItem.ID.None) return true;
+        if (!currentItem.GetDBItem().IsNone) return true;
         
         // Retrieve the piece of loot, removing it from the world
         var inventoryItem = LootController.instance.PullLoot(droppedLoot);
@@ -43,7 +43,7 @@ public static class PlayerInteractionPatch
         if (inventoryItem == null) return false;
         
         // Equip the item into its appropriate slot
-        __instance.playerMain.inventory.SetEquipment(inventoryItem, (int)inventorySlot);
+        __instance.playerMain.inventory.SetEquipment(inventoryItem, (int)equipmentSlot);
 
         // Do not call the original method; we've equipped the item and have no need to store it in inventory
         return false;
@@ -58,29 +58,29 @@ public static class PlayerInteractionPatch
         item.SetGenericNumericValue(numericvalue);
         
         // Retrieve the appropriate inventory slot for the item
-        var inventorySlot = GetInventorySlot(item.GetDBItem().GetSubType());
+        var equipmentSlot = GetEquipmentSlot(item);
 
         // If the item does not belong in any currently available slots, run the original method
-        if (inventorySlot == PlayerInventory.EquippedID.COUNT) return true;
+        if (equipmentSlot == PlayerInventory.EquippedID.COUNT) return true;
 
         // Retrieve the current item in the assigned slot
-        var currentItem = __instance.playerMain.inventory.GetEquipment((int)inventorySlot);
+        var currentItem = __instance.playerMain.inventory.GetEquipment((int)equipmentSlot);
         
         // If an item is already in the slot, run the original method
-        if (currentItem.GetDBItem().itemID is not InventoryItem.ID.None) return true;
+        if (!currentItem.GetDBItem().IsNone) return true;
         
         // Equip the item into its appropriate slot
-        __instance.playerMain.inventory.SetEquipment(item, (int)inventorySlot);
+        __instance.playerMain.inventory.SetEquipment(item, (int)equipmentSlot);
         
         // Do not call the original method; we've equipped the item and have no need to store it in inventory
         return false;
     }
 
-    private static PlayerInventory.EquippedID GetInventorySlot(DatabaseItem.SubType subType)
+    private static PlayerInventory.EquippedID GetEquipmentSlot(InventoryItem item)
     {
         // Get inventory slot for item based on its subtype
         // Return EquippedID.COUNT if unable to find appropriate slot
-        var inventorySlot = subType switch
+        var equipmentSlot = item.GetDBItem().GetSubType() switch
         {
             DatabaseItem.SubType.PrimaryGun => PlayerInventory.EquippedID.PrimaryGun,
             DatabaseItem.SubType.SecondaryGun => PlayerInventory.EquippedID.SecondaryGun,
@@ -91,6 +91,6 @@ public static class PlayerInteractionPatch
             _ => PlayerInventory.EquippedID.COUNT
         };
 
-        return inventorySlot;
+        return equipmentSlot;
     }
 }
