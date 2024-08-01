@@ -9,16 +9,16 @@ namespace AetharNet.Mods.ZumbiBlocks2.AutoEquip;
 public class AutoEquip : BaseUnityPlugin
 {
     public const string PluginGUID = "AetharNet.Mods.ZumbiBlocks2.AutoEquip";
-    public const string PluginAuthor = "awoi";
+    public const string PluginAuthor = "wowi";
     public const string PluginName = "AutoEquip";
-    public const string PluginVersion = "0.1.0";
+    public const string PluginVersion = "0.2.0";
 
-    public new static ManualLogSource Logger;
+    internal new static ManualLogSource Logger;
 
     private void Awake()
     {
         Logger = base.Logger;
         
-        Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+        Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), PluginGUID);
     }
 }
