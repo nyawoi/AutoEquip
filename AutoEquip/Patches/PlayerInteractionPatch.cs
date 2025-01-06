@@ -20,7 +20,7 @@ public static class PlayerInteractionPatch
         if (!SuccessfullyHandledAutoEquip(droppedLoot.item, __instance.playerMain.inventory, out var equipmentSlot)) return true;
         
         // Retrieve the piece of loot, removing it from the world
-        var inventoryItem = LootController.instance.PullLoot(droppedLoot);
+        var inventoryItem = LootController.Instance.PullLoot(droppedLoot);
         
         // If it turns out there was no loot, don't do anything
         // This might occur in situations where two clients attempt to pick up the same piece of loot at the same time

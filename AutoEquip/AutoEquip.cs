@@ -11,7 +11,7 @@ public class AutoEquip : BaseUnityPlugin
     public const string PluginGUID = "AetharNet.Mods.ZumbiBlocks2.AutoEquip";
     public const string PluginAuthor = "wowi";
     public const string PluginName = "AutoEquip";
-    public const string PluginVersion = "0.2.0";
+    public const string PluginVersion = "0.2.1";
 
     internal new static ManualLogSource Logger;
 
